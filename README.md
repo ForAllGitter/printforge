@@ -57,6 +57,10 @@ Requires Node 22+.
 - Binary STL export with colour packs
 - Zustand for studio state
 
+## Print day
+
+P2S settings, AMS mapping, and a suggested order: [PRINT.md](PRINT.md).
+
 ## License
 
 MIT. Crypto marks belong to their respective projects; this repo only generates printable geometry from public brand colours and symbols.
