@@ -29,6 +29,7 @@ import {
   litecoinAdvice,
   litecoinCoin,
 } from "./coins";
+import { cupLid, cupLidAdvice } from "./cup-lid";
 
 import {
   bool,
@@ -527,6 +528,38 @@ export const DESIGNS: Design[] = [
     params: coinParams(),
     build: digibyteCoin,
     advice: digibyteAdvice,
+  },
+  {
+    id: "cup-lid",
+    name: "Cup lid",
+    category: "Storage",
+    blurb: "Snap lid for Alpro-style 400 g cups. 95 mm rim, inner plug, pull tab.",
+    keywords: [
+      "lid",
+      "cup",
+      "yogurt",
+      "yoghurt",
+      "kwark",
+      "quark",
+      "alpro",
+      "cover",
+      "snap",
+      "pot",
+    ],
+    params: [
+      mm("cupOuter", "Cup rim outer", 95, 60, 180, 0.1),
+      mm("flange", "Rim flange width", 3.4, 1.6, 8, 0.1),
+      mm("clearance", "Skirt clearance", 0.25, 0.08, 0.9, 0.05),
+      mm("snap", "Snap undercut", 0.55, 0.15, 1.6, 0.05),
+      mm("rimHeight", "Rim height", 3.8, 2, 10, 0.1),
+      mm("skirt", "Skirt depth", 9, 6, 20, 0.5),
+      mm("plug", "Inner plug", 5.5, 0, 14, 0.5),
+      mm("wall", "Wall", 1.6, 1.2, 3.2, 0.2),
+      mm("top", "Top thickness", 1.8, 1.2, 4, 0.2),
+      { key: "tab", kind: "bool", label: "Pull tab", default: true },
+    ],
+    build: cupLid,
+    advice: cupLidAdvice,
   },
   {
     id: "snap-box",

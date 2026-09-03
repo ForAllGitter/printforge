@@ -55,6 +55,10 @@ export function parseBrief(prompt: string): BriefResult {
       values.inner = b;
       if (c !== undefined) values.height = c;
     }
+    if (best.id === "cup-lid") {
+      values.cupOuter = a;
+      if (b < 20) values.flange = b;
+    }
     if (best.id.endsWith("-coin")) {
       values.diameter = a;
       values.height = b;
@@ -85,6 +89,9 @@ export function parseBrief(prompt: string): BriefResult {
   if (!size && mmHits.length === 1 && "cable" in values) values.cable = mmHits[0]!;
   if (!size && mmHits.length === 1 && best.id === "washer" && "outer" in values) {
     values.outer = mmHits[0]!;
+  }
+  if (!size && mmHits.length >= 1 && best.id === "cup-lid") {
+    values.cupOuter = mmHits[0]!;
   }
   if (!size && mmHits.length >= 1 && best.id.endsWith("-coin")) {
     values.diameter = mmHits[0]!;

@@ -50,6 +50,7 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   "litecoin-coin": Coins,
   "dogecoin-coin": Coins,
   "digibyte-coin": Coins,
+  "cup-lid": Circle,
   "snap-box": Box,
   "divider-bin": LayoutGrid,
   "stacking-bin": Layers,
@@ -70,10 +71,10 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
 type Tab = "models" | "dial" | "print" | "ask";
 
 const PROMPTS = [
+  "Lid for a 95 mm Alpro kwark cup",
   "Bitcoin coin 28 x 14 mm",
   "Dogecoin 28 mm with white rim",
-  "Litecoin token 28 x 14",
-  "DigiByte coin 28 mm",
+  "Gift box 180 x 90 x 45 with lid",
 ];
 
 export function Studio() {
@@ -355,6 +356,35 @@ function ParamPanel({
             label="Fit P2S"
             onClick={() => {
               setValue("fitP2s", true);
+            }}
+          />
+        </div>
+      ) : null}
+      {designId === "cup-lid" ? (
+        <div className="flex flex-wrap gap-1.5 px-4 pt-3">
+          <PresetChip
+            label="Alpro 95 mm"
+            onClick={() => {
+              setValue("cupOuter", 95);
+              setValue("flange", 3.4);
+              setValue("clearance", 0.25);
+              setValue("snap", 0.55);
+              setValue("rimHeight", 3.8);
+              setValue("tab", true);
+            }}
+          />
+          <PresetChip
+            label="Tighter"
+            onClick={() => {
+              setValue("clearance", 0.15);
+              setValue("snap", 0.7);
+            }}
+          />
+          <PresetChip
+            label="Looser"
+            onClick={() => {
+              setValue("clearance", 0.4);
+              setValue("snap", 0.35);
             }}
           />
         </div>

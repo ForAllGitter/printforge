@@ -25,7 +25,7 @@ type StudioState = {
   removeSaved: (id: string) => void;
 };
 
-const first = DESIGNS[0]!;
+const start = getDesign("cup-lid") ?? DESIGNS[0]!;
 
 const memoryStorage = {
   getItem: () => null,
@@ -36,9 +36,9 @@ const memoryStorage = {
 export const useStudio = create<StudioState>()(
   persist(
     (set, get) => ({
-      designId: first.id,
-      values: defaultsOf(first),
-      filamentId: "xmr-orange",
+      designId: start.id,
+      values: defaultsOf(start),
+      filamentId: "true-white",
       library: [],
       setDesign: (id) => {
         const design = getDesign(id);
@@ -71,7 +71,7 @@ export const useStudio = create<StudioState>()(
         set({ library: get().library.filter((s) => s.id !== id) }),
     }),
     {
-      name: "printforge-studio-v3",
+      name: "printforge-studio-v4",
       storage: createJSONStorage(() =>
         typeof window === "undefined" ? memoryStorage : localStorage,
       ),
