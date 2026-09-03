@@ -73,7 +73,8 @@ export function fmt(n: number) {
 export const FILAMENTS = [
   { id: "xmr-orange", name: "XMR Orange", color: "#FF6600" },
   { id: "btc-orange", name: "BTC Orange", color: "#F7931A" },
-  { id: "doge-gold", name: "DOGE Gold", color: "#C2A633" },
+  { id: "doge-gold", name: "DOGE Gold", color: "#C3A634" },
+  { id: "doge-cream", name: "DOGE Cream", color: "#F4E0A8" },
   { id: "ltc-blue", name: "LTC Blue", color: "#345D9D" },
   { id: "dgb-blue", name: "DGB Blue", color: "#0066CC" },
   { id: "true-white", name: "True White", color: "#FFFFFF" },

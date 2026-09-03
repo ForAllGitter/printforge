@@ -4,8 +4,8 @@ import {
   circleAt,
   extrude,
   intersect,
+  poly2,
   rect2,
-  rotateZ,
   subtract,
   translate,
   union,
@@ -13,6 +13,7 @@ import {
   type Geom3,
 } from "./geometry";
 import { primitives } from "./jscad";
+import { largestFirst, pathContours, scaleFlip } from "./svg-path";
 import {
   bool,
   clamp,
@@ -29,7 +30,8 @@ const { cylinder } = primitives;
 export const WHITE = "#FFFFFF";
 export const BTC_ORANGE = "#F7931A";
 export const LTC_BLUE = "#345D9D";
-export const DOGE_GOLD = "#C2A633";
+export const DOGE_GOLD = "#C3A634";
+export const DOGE_CREAM = "#F4E0A8";
 export const DGB_BLUE = "#0066CC";
 export const DGB_NAVY = "#002352";
 
@@ -69,90 +71,89 @@ function sitParts(parts: ColorPart[]): ColorPart[] {
   }));
 }
 
-/** Bitcoin ₿ — double vertical stroke + two bowls. */
+/** Bitcoin ₿ from cryptocurrency-icons / Bitcoin.svg, 32×32 viewBox. */
+const BTC_PATH =
+  "M23.189 14.02c.314-2.096-1.283-3.223-3.465-3.975l.708-2.84-1.728-.43-.69 2.765c-.454-.114-.92-.22-1.385-.326l.695-2.783L15.596 6l-.708 2.839c-.376-.086-.746-.17-1.104-.26l.002-.009-2.384-.595-.46 1.846s1.283.294 1.256.312c.7.175.826.638.805 1.006l-.806 3.235c.048.012.11.03.18.057l-.183-.045-1.13 4.532c-.086.212-.303.531-.793.41.018.025-1.256-.313-1.256-.313l-.858 1.978 2.25.561c.418.105.828.215 1.231.318l-.715 2.872 1.727.43.708-2.84c.472.127.93.245 1.378.357l-.706 2.828 1.728.43.715-2.866c2.948.558 5.164.333 6.097-2.333.752-2.146-.037-3.385-1.588-4.192 1.13-.26 1.98-1.003 2.207-2.538zm-3.95 5.538c-.533 2.147-4.148.986-5.32.695l.95-3.805c1.172.293 4.929.872 4.37 3.11zm.535-5.569c-.487 1.953-3.495.96-4.47.717l.86-3.45c.975.243 4.118.696 3.61 2.733z";
+
+/** Litecoin Ł from cryptocurrency-icons, 32×32 viewBox. */
+const LTC_PATH =
+  "M10.427 19.214L9 19.768l.688-2.759 1.444-.58L13.213 8h5.129l-1.519 6.196 1.41-.571-.68 2.75-1.427.571-.848 3.483H23L22.127 24H9.252z";
+
+/** Official DigiByte D, 1280 viewBox, centre 640. */
+const DGB_PATH =
+  "M769.9,428l15-39.1c1.5-4-1.4-8.2-5.6-8.2h-55.7L706,426.5h-24.7l14.4-37.6c1.5-4-1.4-8.2-5.6-8.2h-55.7 l-17.6,45.8H442.6c-7.9,0-15.3,4.3-19.2,11.2L380,514.3h60.7h264.8c10.8,0,21.5,2,31.5,6.1c19.2,7.9,41.9,25.8,36.2,66.1 c-9.5,67.5-78.3,187.1-227.6,189l77.2-201c3.2-8.3-2.9-17.1-11.8-17.1H507.5l-125,307.2c0,0,25.2,3.1,64.7,3.1L434.8,900h56.9 c4.5,0,8.6-2.8,10.3-7l10.7-27.8c8.4-0.7,16.9-1.6,25.7-2.6L524,900h56.9c4.5,0,8.6-2.8,10.3-7l16.2-42.3 c93.5-21.3,194-67.7,253.7-165.6C981.6,487.7,856.4,436.7,769.9,428z";
+
+function markFromPath(d: string, view: number, logoD: number, cx?: number, cy?: number): Geom2 {
+  const s = logoD / view;
+  const c = cx ?? view / 2;
+  const k = cy ?? view / 2;
+  const contours = largestFirst(scaleFlip(pathContours(d, 8), c, k, s));
+  if (!contours.length) return circle2(logoD * 0.1, 12);
+  let g = poly2(contours[0]!);
+  for (let i = 1; i < contours.length; i++) {
+    try {
+      g = subtract(g, poly2(contours[i]!));
+    } catch {
+      /* skip degenerate hole */
+    }
+  }
+  return g;
+}
+
 export function bitcoinB(d: number): Geom2 {
-  const t = d * 0.092;
-  const h = d * 0.58;
-  const xL = -d * 0.13;
-  const xR = -d * 0.02;
-  const bar1 = rect2(t, h, xL, 0);
-  const bar2 = rect2(t, h, xR, 0);
-  const serifW = t * 3.55;
-  const serifX = (xL + xR) / 2;
-  const top = rect2(serifW, t, serifX, h / 2 - t * 0.42);
-  const bot = rect2(serifW, t, serifX, -h / 2 + t * 0.42);
-
-  const ur = d * 0.152;
-  const ucx = xR + ur * 0.42;
-  const ucy = h * 0.155;
-  const upper = subtract(
-    circleAt(ur, ucx, ucy, 28),
-    circleAt(Math.max(0.35, ur - t), ucx, ucy, 28),
-    rect2(ur * 2.1, ur * 2.4, ucx - ur * 0.95, ucy),
-  );
-
-  const lr = d * 0.188;
-  const lcx = xR + lr * 0.38;
-  const lcy = -h * 0.155;
-  const lower = subtract(
-    circleAt(lr, lcx, lcy, 28),
-    circleAt(Math.max(0.35, lr - t), lcx, lcy, 28),
-    rect2(lr * 2.1, lr * 2.4, lcx - lr * 0.95, lcy),
-  );
-
-  const joinU = rect2(t * 1.4, t, xR + t * 0.4, ucy);
-  const joinL = rect2(t * 1.4, t, xR + t * 0.4, lcy);
-  const mid = rect2(t * 2.2, t, xR + t * 0.6, 0);
-  return union(bar1, bar2, top, bot, upper, lower, joinU, joinL, mid);
+  return markFromPath(BTC_PATH, 32, d);
 }
 
-/** Litecoin Ł — L with a slash. */
 export function litecoinL(d: number): Geom2 {
-  const t = d * 0.11;
-  const stem = rect2(t, d * 0.5, -d * 0.1, d * 0.02);
-  const foot = rect2(d * 0.36, t, d * 0.04, -d * 0.23);
-  const slash = rotateZ((-18 * Math.PI) / 180, rect2(d * 0.46, t, d * 0.02, d * 0.05));
-  return union(stem, foot, slash);
+  return markFromPath(LTC_PATH, 32, d);
 }
 
-/** Dogecoin D with the mid bar. */
+/** Bold geometric D matching the CoinMarketCap overlay. */
 export function dogeD(d: number): Geom2 {
-  const t = d * 0.11;
-  const h = d * 0.52;
-  const stemX = -d * 0.13;
-  const stem = rect2(t, h, stemX, 0);
-  const r = d * 0.26;
-  const cx = -d * 0.01;
-  const bowl = subtract(
-    circleAt(r, cx, 0, 32),
-    circleAt(Math.max(0.4, r - t), cx, 0, 32),
-    rect2(r * 1.7, r * 2.3, cx - r * 0.78, 0),
-  );
-  const bar = rect2(d * 0.4, t, -d * 0.02, 0);
-  return union(stem, bowl, bar);
-}
-
-/** DigiByte D — bold D, no crossbar. */
-export function digibyteD(d: number): Geom2 {
-  const t = d * 0.125;
-  const h = d * 0.5;
-  const stemX = -d * 0.12;
-  const stem = rect2(t, h, stemX, 0);
-  const r = d * 0.25;
+  const t = d * 0.155;
+  const h = d * 0.56;
+  const stem = rect2(t, h, -d * 0.13, 0);
+  const r = d * 0.28;
   const cx = 0;
   const bowl = subtract(
-    circleAt(r, cx, 0, 32),
-    circleAt(Math.max(0.4, r - t), cx, 0, 32),
-    rect2(r * 1.65, r * 2.3, cx - r * 0.8, 0),
+    circleAt(r, cx, 0, 36),
+    circleAt(Math.max(0.5, r - t), cx, 0, 36),
+    rect2(r * 1.65, r * 2.3, cx - r * 0.78, 0),
   );
   return union(stem, bowl);
+}
+
+/** Simplified Shiba silhouette — ears and snout peek around the D. */
+export function shibaHead(d: number): Geom2 {
+  const head = circleAt(d * 0.34, 0.02 * d, -0.02 * d, 28);
+  const leftEar = poly2([
+    [-0.26 * d, 0.04 * d],
+    [-0.34 * d, 0.42 * d],
+    [-0.08 * d, 0.16 * d],
+  ]);
+  const rightEar = poly2([
+    [0.08 * d, 0.16 * d],
+    [0.34 * d, 0.42 * d],
+    [0.26 * d, 0.04 * d],
+  ]);
+  const snout = circleAt(0.15 * d, -0.12 * d, -0.22 * d, 18);
+  const cheek = circleAt(0.12 * d, 0.16 * d, -0.16 * d, 16);
+  return union(head, leftEar, rightEar, snout, cheek);
+}
+
+export function digibyteD(d: number): Geom2 {
+  return markFromPath(DGB_PATH, 519.9 * 2, d, 640, 640);
 }
 
 type CoinSpec = {
   field: string;
   fieldName: string;
   symbol: (d: number) => Geom2;
+  /** Extra colour under the white mark (Dogecoin Shiba). */
+  overlay?: { name: string; color: string; shape: (d: number) => Geom2 };
   ring?: { color: string; name: string; innerFrac: number };
+  /** Scale of the mark relative to the inner disc. Official icons fill the circle. */
+  markScale?: number;
 };
 
 function sized(values: Values) {
@@ -178,13 +179,26 @@ function buildCoin(spec: CoinSpec, values: Values): ColorPart[] {
   const segs = D > 180 ? 64 : 48;
   const logoD = Math.max(10, D - 2 * Math.max(0, rimW));
   const logoR = logoD / 2;
-  const symbolD = logoD * 0.7;
+  const markScale = spec.markScale ?? 1;
+  const symbolD = logoD * markScale;
   const raw = spec.symbol(symbolD);
   let symbol2: Geom2;
   try {
-    symbol2 = intersect(raw, circle2(logoR * 0.9, segs));
+    symbol2 = intersect(raw, circle2(logoR * 0.94, segs));
   } catch {
     symbol2 = raw;
+  }
+
+  let overlay2: Geom2 | null = null;
+  if (spec.overlay) {
+    try {
+      overlay2 = subtract(
+        intersect(spec.overlay.shape(logoD), circle2(logoR * 0.996, segs)),
+        symbol2,
+      );
+    } catch {
+      overlay2 = spec.overlay.shape(logoD);
+    }
   }
 
   const logoH = through ? H : Math.min(inlay, H - 0.6);
@@ -195,9 +209,13 @@ function buildCoin(spec: CoinSpec, values: Values): ColorPart[] {
   let ring2: Geom2 | null = null;
   if (spec.ring && innerR > 2) {
     ring2 = subtract(circle2(logoR, segs), circle2(innerR, segs));
-    field2 = subtract(circle2(innerR * 0.998, segs), symbol2);
+    field2 = overlay2
+      ? subtract(circle2(innerR * 0.998, segs), overlay2, symbol2)
+      : subtract(circle2(innerR * 0.998, segs), symbol2);
   } else {
-    field2 = subtract(circle2(logoR * 0.996, segs), symbol2);
+    field2 = overlay2
+      ? subtract(circle2(logoR * 0.996, segs), overlay2, symbol2)
+      : subtract(circle2(logoR * 0.996, segs), symbol2);
   }
 
   let field = translate([0, 0, logoZ], extrude(logoH, field2));
@@ -205,6 +223,9 @@ function buildCoin(spec: CoinSpec, values: Values): ColorPart[] {
     ring2 && spec.ring
       ? translate([0, 0, logoZ], extrude(logoH, ring2))
       : null;
+  let overlayGeom: Geom3 | null = overlay2
+    ? translate([0, 0, logoZ], extrude(logoH, overlay2))
+    : null;
   const symbol = translate([0, 0, logoZ], extrude(logoH, symbol2));
 
   let white: Geom3;
@@ -218,11 +239,15 @@ function buildCoin(spec: CoinSpec, values: Values): ColorPart[] {
   } else {
     const body = cyl(D / 2, H, H / 2, segs);
     const pocketF = translate([0, 0, logoZ - 0.05], extrude(logoH + 0.2, field2));
+    const pocketO = overlay2
+      ? translate([0, 0, logoZ - 0.05], extrude(logoH + 0.2, overlay2))
+      : null;
     const pocketR =
       ring2 && spec.ring
         ? translate([0, 0, logoZ - 0.05], extrude(logoH + 0.2, ring2))
         : null;
-    white = pocketR ? subtract(body, pocketF, pocketR) : subtract(body, pocketF);
+    const pockets = [pocketF, pocketO, pocketR].filter(Boolean) as Geom3[];
+    white = pockets.length === 1 ? subtract(body, pockets[0]!) : subtract(body, ...(pockets as [Geom3, ...Geom3[]]));
   }
 
   if (wall >= 1.6 && D > 60 && H > wall * 2 + 8) {
@@ -231,6 +256,7 @@ function buildCoin(spec: CoinSpec, values: Values): ColorPart[] {
     const cavity = cyl(cavityR, cavityH, wall + cavityH / 2, segs);
     field = subtract(field, cavity);
     if (ring) ring = subtract(ring, cavity);
+    if (overlayGeom) overlayGeom = subtract(overlayGeom, cavity);
     if (!through) white = subtract(white, cavity);
   }
 
@@ -238,6 +264,9 @@ function buildCoin(spec: CoinSpec, values: Values): ColorPart[] {
     { name: spec.fieldName, color: spec.field, geom: field },
     { name: "white", color: WHITE, geom: white },
   ];
+  if (overlayGeom && spec.overlay) {
+    parts.splice(1, 0, { name: spec.overlay.name, color: spec.overlay.color, geom: overlayGeom });
+  }
   if (ring && spec.ring) {
     parts.splice(1, 0, { name: spec.ring.name, color: spec.ring.color, geom: ring });
   }
@@ -294,13 +323,15 @@ const DOGE: CoinSpec = {
   field: DOGE_GOLD,
   fieldName: "gold",
   symbol: dogeD,
+  overlay: { name: "cream", color: DOGE_CREAM, shape: shibaHead },
+  markScale: 0.64,
 };
 
 const DGB: CoinSpec = {
   field: DGB_NAVY,
   fieldName: "navy",
   symbol: digibyteD,
-  ring: { color: DGB_BLUE, name: "blue", innerFrac: 0.78 },
+  ring: { color: DGB_BLUE, name: "blue", innerFrac: 0.812 },
 };
 
 export function bitcoinCoin(values: Values) {
@@ -323,7 +354,11 @@ export function litecoinAdvice(v: Values) {
   return adviceFor("Litecoin blue / white", "blue #345D9D, white #FFFFFF", v);
 }
 export function dogecoinAdvice(v: Values) {
-  return adviceFor("Dogecoin gold / white", "gold #C2A633, white #FFFFFF", v);
+  return adviceFor(
+    "Dogecoin gold / cream / white",
+    "gold #C3A634, cream #F4E0A8, white #FFFFFF",
+    v,
+  );
 }
 export function digibyteAdvice(v: Values) {
   return adviceFor(
