@@ -207,3 +207,17 @@ export function scaleFlip(contours: Pt[][], cx: number, cy: number, s: number): 
 export function largestFirst(contours: Pt[][]): Pt[][] {
   return [...contours].sort((a, b) => Math.abs(area(b)) - Math.abs(area(a)));
 }
+
+export function cleanContour(pts: Pt[], ccw = true): Pt[] {
+  const out: Pt[] = [];
+  for (const p of pts) {
+    const last = out[out.length - 1];
+    if (!last || Math.hypot(p[0] - last[0], p[1] - last[1]) > 1e-4) out.push([p[0], p[1]]);
+  }
+  if (out.length > 2 && closeEnough(out[0]!, out[out.length - 1]!)) out.pop();
+  if (out.length < 3) return out;
+  const a = area(out);
+  if (ccw && a < 0) out.reverse();
+  if (!ccw && a > 0) out.reverse();
+  return out;
+}

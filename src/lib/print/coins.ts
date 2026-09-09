@@ -13,7 +13,7 @@ import {
   type Geom3,
 } from "./geometry";
 import { primitives } from "./jscad";
-import { largestFirst, pathContours, scaleFlip } from "./svg-path";
+import { largestFirst, pathContours, scaleFlip, cleanContour } from "./svg-path";
 import {
   bool,
   clamp,
@@ -87,12 +87,16 @@ function markFromPath(d: string, view: number, logoD: number, cx?: number, cy?: 
   const s = logoD / view;
   const c = cx ?? view / 2;
   const k = cy ?? view / 2;
-  const contours = largestFirst(scaleFlip(pathContours(d, 8), c, k, s));
-  if (!contours.length) return circle2(logoD * 0.1, 12);
+  const contours = largestFirst(scaleFlip(pathContours(d, 10), c, k, s)).map((pts) =>
+    cleanContour(pts, true),
+  );
+  if (!contours.length || contours[0]!.length < 3) return circle2(logoD * 0.1, 12);
   let g = poly2(contours[0]!);
   for (let i = 1; i < contours.length; i++) {
+    const hole = contours[i]!;
+    if (hole.length < 3) continue;
     try {
-      g = subtract(g, poly2(contours[i]!));
+      g = subtract(g, poly2(hole));
     } catch {
       /* skip degenerate hole */
     }
@@ -123,22 +127,24 @@ export function dogeD(d: number): Geom2 {
   return union(stem, bowl);
 }
 
-/** Simplified Shiba silhouette — ears and snout peek around the D. */
+/** Kabosu silhouette as one closed outline — no 2D unions (those break JSCAD). */
 export function shibaHead(d: number): Geom2 {
-  const head = circleAt(d * 0.34, 0.02 * d, -0.02 * d, 28);
-  const leftEar = poly2([
-    [-0.26 * d, 0.04 * d],
-    [-0.34 * d, 0.42 * d],
-    [-0.08 * d, 0.16 * d],
-  ]);
-  const rightEar = poly2([
-    [0.08 * d, 0.16 * d],
-    [0.34 * d, 0.42 * d],
-    [0.26 * d, 0.04 * d],
-  ]);
-  const snout = circleAt(0.15 * d, -0.12 * d, -0.22 * d, 18);
-  const cheek = circleAt(0.12 * d, 0.16 * d, -0.16 * d, 16);
-  return union(head, leftEar, rightEar, snout, cheek);
+  const p: [number, number][] = [
+    [-0.08, 0.16],
+    [-0.26, 0.46],
+    [-0.32, 0.10],
+    [-0.38, -0.02],
+    [-0.36, -0.18],
+    [-0.26, -0.32],
+    [-0.08, -0.40],
+    [0.12, -0.36],
+    [0.26, -0.22],
+    [0.34, -0.06],
+    [0.36, 0.10],
+    [0.26, 0.46],
+    [0.08, 0.16],
+  ].map(([x, y]) => [x * d, y * d]);
+  return poly2(cleanContour(p, true));
 }
 
 export function digibyteD(d: number): Geom2 {
