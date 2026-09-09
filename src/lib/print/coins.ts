@@ -112,9 +112,9 @@ export function litecoinL(d: number): Geom2 {
   return markFromPath(LTC_PATH, 32, d);
 }
 
-/** Overlay D on the Shiba — no mid-bar, matches the flag mark. */
+/** Dogecoin Đ — bold D with a mid bar through the stem. */
 export function dogeD(d: number): Geom2 {
-  const t = d * 0.155;
+  const t = d * 0.12;
   const h = d * 0.58;
   const stemX = -d * 0.12;
   const stem = rect2(t, h, stemX, 0);
@@ -122,39 +122,10 @@ export function dogeD(d: number): Geom2 {
   const r = h / 2;
   const leftCut = rect2(r * 2.2, r * 2.2, cx - r, 0);
   const outerBowl = subtract(circleAt(r, cx, 0, 48), leftCut);
-  const innerBowl = subtract(circleAt(Math.max(0.7, r - t), cx, 0, 48), leftCut);
+  const innerBowl = subtract(circleAt(Math.max(0.6, r - t), cx, 0, 48), leftCut);
   const bowl = subtract(outerBowl, innerBowl);
-  return union(stem, bowl);
-}
-
-/** Kabosu as one closed contour (arcs + ear tips). No 2D unions. */
-export function shibaHead(d: number): Geom2 {
-  const pts: [number, number][] = [];
-  const P = (x: number, y: number) => pts.push([x * d, y * d]);
-  const hc: [number, number] = [0.03, -0.02];
-  const hr = 0.33;
-  const headArc = (fromDeg: number, toDeg: number, n: number) => {
-    let a0 = (fromDeg * Math.PI) / 180;
-    let a1 = (toDeg * Math.PI) / 180;
-    if (a1 < a0) a1 += Math.PI * 2;
-    for (let i = 0; i <= n; i++) {
-      const a = a0 + ((a1 - a0) * i) / n;
-      let r = hr;
-      const ad = (((a * 180) / Math.PI) % 360 + 360) % 360;
-      if (ad > 195 && ad < 250) r += 0.06 * Math.sin(((ad - 195) / 55) * Math.PI);
-      P(hc[0] + r * Math.cos(a), hc[1] + r * Math.sin(a));
-    }
-  };
-  P(-0.05, 0.17);
-  P(-0.15, 0.28);
-  P(-0.20, 0.48);
-  P(-0.31, 0.12);
-  headArc(160, 32, 20);
-  P(0.31, 0.12);
-  P(0.22, 0.47);
-  P(0.08, 0.26);
-  P(0.04, 0.16);
-  return poly2(cleanContour(pts, true));
+  const bar = rect2(t * 2.35, t, stemX - t * 0.5, 0);
+  return union(stem, bowl, bar);
 }
 
 export function digibyteD(d: number): Geom2 {
@@ -339,8 +310,7 @@ const DOGE: CoinSpec = {
   field: DOGE_GOLD,
   fieldName: "gold",
   symbol: dogeD,
-  overlay: { name: "cream", color: DOGE_CREAM, shape: shibaHead },
-  markScale: 0.7,
+  markScale: 0.78,
 };
 
 const DGB: CoinSpec = {
@@ -370,11 +340,7 @@ export function litecoinAdvice(v: Values) {
   return adviceFor("Litecoin blue / white", "blue #345D9D, white #FFFFFF", v);
 }
 export function dogecoinAdvice(v: Values) {
-  return adviceFor(
-    "Dogecoin gold / cream / white",
-    "gold #C3A634, cream #F4E0A8, white #FFFFFF",
-    v,
-  );
+  return adviceFor("Dogecoin gold / white", "gold #C3A634, white #FFFFFF", v);
 }
 export function digibyteAdvice(v: Values) {
   return adviceFor(
