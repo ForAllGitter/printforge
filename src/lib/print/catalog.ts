@@ -513,7 +513,7 @@ export const DESIGNS: Design[] = [
     id: "dogecoin-coin",
     name: "Dogecoin coin",
     category: "Crypto",
-    blurb: "Dogecoin — Shiba on gold, cream face, white D. 28 × 14 mm.",
+    blurb: "Dogecoin Đ on gold. White mark and 1 mm white rim. 28 × 14 mm.",
     keywords: ["doge", "dogecoin", "coin", "logo", "crypto", "token", "gold"],
     params: coinParams(),
     build: dogecoinCoin,

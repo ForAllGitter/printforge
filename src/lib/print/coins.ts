@@ -112,39 +112,20 @@ export function litecoinL(d: number): Geom2 {
   return markFromPath(LTC_PATH, 32, d);
 }
 
-/** Bold geometric D matching the CoinMarketCap overlay. */
+/** Dogecoin Đ — bold D with a mid bar through the stem. */
 export function dogeD(d: number): Geom2 {
-  const t = d * 0.155;
-  const h = d * 0.56;
-  const stem = rect2(t, h, -d * 0.13, 0);
-  const r = d * 0.28;
-  const cx = 0;
-  const bowl = subtract(
-    circleAt(r, cx, 0, 36),
-    circleAt(Math.max(0.5, r - t), cx, 0, 36),
-    rect2(r * 1.65, r * 2.3, cx - r * 0.78, 0),
-  );
-  return union(stem, bowl);
-}
-
-/** Kabosu silhouette as one closed outline — no 2D unions (those break JSCAD). */
-export function shibaHead(d: number): Geom2 {
-  const p: [number, number][] = [
-    [-0.08, 0.16],
-    [-0.26, 0.46],
-    [-0.32, 0.10],
-    [-0.38, -0.02],
-    [-0.36, -0.18],
-    [-0.26, -0.32],
-    [-0.08, -0.40],
-    [0.12, -0.36],
-    [0.26, -0.22],
-    [0.34, -0.06],
-    [0.36, 0.10],
-    [0.26, 0.46],
-    [0.08, 0.16],
-  ].map(([x, y]) => [x * d, y * d]);
-  return poly2(cleanContour(p, true));
+  const t = d * 0.12;
+  const h = d * 0.58;
+  const stemX = -d * 0.12;
+  const stem = rect2(t, h, stemX, 0);
+  const cx = stemX + t / 2;
+  const r = h / 2;
+  const leftCut = rect2(r * 2.2, r * 2.2, cx - r, 0);
+  const outerBowl = subtract(circleAt(r, cx, 0, 48), leftCut);
+  const innerBowl = subtract(circleAt(Math.max(0.6, r - t), cx, 0, 48), leftCut);
+  const bowl = subtract(outerBowl, innerBowl);
+  const bar = rect2(t * 2.35, t, stemX - t * 0.5, 0);
+  return union(stem, bowl, bar);
 }
 
 export function digibyteD(d: number): Geom2 {
@@ -329,8 +310,7 @@ const DOGE: CoinSpec = {
   field: DOGE_GOLD,
   fieldName: "gold",
   symbol: dogeD,
-  overlay: { name: "cream", color: DOGE_CREAM, shape: shibaHead },
-  markScale: 0.64,
+  markScale: 0.78,
 };
 
 const DGB: CoinSpec = {
@@ -360,11 +340,7 @@ export function litecoinAdvice(v: Values) {
   return adviceFor("Litecoin blue / white", "blue #345D9D, white #FFFFFF", v);
 }
 export function dogecoinAdvice(v: Values) {
-  return adviceFor(
-    "Dogecoin gold / cream / white",
-    "gold #C3A634, cream #F4E0A8, white #FFFFFF",
-    v,
-  );
+  return adviceFor("Dogecoin gold / white", "gold #C3A634, white #FFFFFF", v);
 }
 export function digibyteAdvice(v: Values) {
   return adviceFor(
