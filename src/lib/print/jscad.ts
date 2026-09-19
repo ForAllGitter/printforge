@@ -14,6 +14,7 @@ export const {
   measurements,
   geometries,
   text,
+  hulls,
 } = modeling;
 
 export type Geom3 = ReturnType<typeof primitives.cuboid>;

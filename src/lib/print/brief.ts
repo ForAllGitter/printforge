@@ -93,6 +93,13 @@ export function parseBrief(prompt: string): BriefResult {
   if (!size && mmHits.length >= 1 && best.id === "cup-lid") {
     values.cupOuter = mmHits[0]!;
   }
+  if (/sleeve|leaker/.test(q) && best.id === "briquette-press") values.part = "sleeve";
+  if (/handle|press/.test(q) && best.id === "briquette-press" && !/sleeve|ring|plate/.test(q)) {
+    values.part = "handle";
+  }
+  if (/plate/.test(q) && best.id === "briquette-press") values.part = "plate";
+  if (/drain ring|ring/.test(q) && best.id === "briquette-press") values.part = "ring";
+  if (/stack|kit|4 part/.test(q) && best.id === "briquette-press") values.part = "handle";
   if (!size && mmHits.length >= 1 && best.id.endsWith("-coin")) {
     values.diameter = mmHits[0]!;
     if (mmHits[1]) values.height = mmHits[1]!;

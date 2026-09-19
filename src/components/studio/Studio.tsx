@@ -36,6 +36,7 @@ import { parseBrief } from "@/lib/print/brief";
 import { DESIGNS, getDesign } from "@/lib/print/catalog";
 import { FILAMENTS } from "@/lib/print/p2s";
 import { downloadColorPack, downloadStl, stlName } from "@/lib/print/stl";
+import { downloadKitPart, kitScaleOf } from "@/lib/print/kit-stl";
 import { useStudio } from "@/lib/print/store";
 import { suggestDesign } from "@/lib/print/suggest";
 import { fmt } from "@/lib/print/p2s";
@@ -50,6 +51,7 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   "litecoin-coin": Coins,
   "dogecoin-coin": Coins,
   "digibyte-coin": Coins,
+  "briquette-press": Printer,
   "cup-lid": Circle,
   "snap-box": Box,
   "divider-bin": LayoutGrid,
@@ -71,6 +73,7 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
 type Tab = "models" | "dial" | "print" | "ask";
 
 const PROMPTS = [
+  "Briquette press 14% larger with D3DD",
   "Lid for a 95 mm Alpro kwark cup",
   "Bitcoin coin 28 x 14 mm",
   "Dogecoin 28 mm with white rim",
@@ -94,18 +97,33 @@ function StudioShell() {
 
   const size = built.stats?.size ?? [40, 20, 40];
 
-  function handleDownload() {
+  async function handleDownload() {
     if (!built.parts.length || !built.stats) {
       toast.error(built.error ?? "Nothing to export yet");
       return;
     }
     const base = stlName(built.design.id, built.stats.size);
+    if (built.kitFile) {
+      try {
+        await downloadKitPart(built.kitFile, `${base}.stl`, kitScaleOf(values));
+        toast.success("STL ready — drop it into Bambu Studio");
+      } catch {
+        toast.error("Could not fetch the edited STL");
+      }
+      return;
+    }
     if (built.parts.length > 1) {
       downloadColorPack(built.parts, base);
-      toast.success("AMS pack ready — orange, white, grey STLs");
-    } else {
-      downloadStl(built.parts[0]!.geom, `${base}.stl`);
+      toast.success(
+        designId === "briquette-press"
+          ? `${built.parts.length} STLs — each piece is its own file`
+          : "AMS pack ready — orange, white, grey STLs",
+      );
+    } else if (built.geom) {
+      downloadStl(built.geom, `${base}.stl`);
       toast.success("STL ready — drop it into Bambu Studio");
+    } else {
+      toast.error("Nothing to export yet");
     }
   }
 
@@ -356,6 +374,38 @@ function ParamPanel({
             label="Fit P2S"
             onClick={() => {
               setValue("fitP2s", true);
+            }}
+          />
+        </div>
+      ) : null}
+      {designId === "briquette-press" ? (
+        <div className="flex flex-wrap gap-1.5 px-4 pt-3">
+          <PresetChip
+            label="1 Handle"
+            onClick={() => {
+              setValue("part", "handle");
+              setValue("scale", 114);
+            }}
+          />
+          <PresetChip
+            label="2 Sleeve"
+            onClick={() => {
+              setValue("part", "sleeve");
+              setValue("scale", 114);
+            }}
+          />
+          <PresetChip
+            label="3 Hex plate"
+            onClick={() => {
+              setValue("part", "plate");
+              setValue("scale", 114);
+            }}
+          />
+          <PresetChip
+            label="4 Drain ring"
+            onClick={() => {
+              setValue("part", "ring");
+              setValue("scale", 114);
             }}
           />
         </div>

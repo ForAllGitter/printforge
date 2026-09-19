@@ -30,6 +30,7 @@ import {
   litecoinCoin,
 } from "./coins";
 import { cupLid, cupLidAdvice } from "./cup-lid";
+import { handPress, handPressAdvice } from "./handpress";
 
 import {
   bool,
@@ -528,6 +529,62 @@ export const DESIGNS: Design[] = [
     params: coinParams(),
     build: digibyteCoin,
     advice: digibyteAdvice,
+  },
+  {
+    id: "briquette-press",
+    name: "Briquette press",
+    category: "Everyday",
+    blurb: "Coffee-grounds press. One part at a time: handle, sleeve, hex plate, drain ring.",
+    keywords: [
+      "press",
+      "briquette",
+      "coffee",
+      "grounds",
+      "handpress",
+      "outin",
+      "leaker",
+      "sleeve",
+      "d3dd",
+      "fire",
+    ],
+    params: [
+      {
+        key: "part",
+        kind: "select",
+        label: "Part",
+        options: [
+          { value: "handle", label: "1 · Handle" },
+          { value: "sleeve", label: "2 · Sleeve (hinged + clip)" },
+          { value: "plate", label: "3 · Hex plate" },
+          { value: "ring", label: "4 · Drain ring" },
+          { value: "container", label: "Grounds pot" },
+          { value: "lid", label: "Pot lid" },
+          { value: "spatula", label: "Spatula" },
+        ],
+        default: "sleeve",
+      },
+      {
+        key: "scale",
+        kind: "number",
+        label: "Scale",
+        min: 80,
+        max: 140,
+        step: 1,
+        unit: "%",
+        default: 114,
+      },
+      mm("hole", "Hole radius", 7.5, 4, 16, 0.5),
+      count("holes", "Sleeve windows", 8, 4, 12),
+      {
+        key: "brand",
+        kind: "text",
+        label: "Stamp",
+        default: "D3DD",
+        maxLength: 8,
+      },
+    ],
+    build: handPress,
+    advice: handPressAdvice,
   },
   {
     id: "cup-lid",

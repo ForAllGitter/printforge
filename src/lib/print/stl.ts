@@ -60,6 +60,10 @@ export function downloadStl(geom: Geom3, filename: string) {
   triggerDownload(buf, name, "model/stl");
 }
 
+export function downloadBuffer(buf: ArrayBuffer, filename: string, mime = "model/stl") {
+  triggerDownload(buf, filename, mime);
+}
+
 const CRC_TABLE = (() => {
   const t = new Uint32Array(256);
   for (let i = 0; i < 256; i++) {
