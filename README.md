@@ -38,6 +38,17 @@ Presets on every crypto model: **Token 28 mm**, **Desk 50 mm**, **Fit P2S**.
 
 Crypto coins plus snap-lid boxes, divider bins, phone stands, cable clips, nameplates, washers, and other P2S-sized parts. Describe a part in the brief box to jump to a matching model.
 
+## D3DD briquette press
+
+Working cardboard-pulp / coffee-grounds press, 14% larger than the original Outin kit. One part at a time:
+
+1. **Handle** — T-bar on top, blended into the shaft, D3DD recessed 1 mm. No hang hole.
+2. **Sleeve** — two halves joined with a print-in-place hinge, one pair of long outer lugs, closed-box clip. Drain holes Ø3.5 mm.
+3. **Hex plate** — next.
+4. **Drain ring** — next.
+
+PrintForge defaults to the sleeve so you can inspect the hinge, lugs, and clip.
+
 ## Run locally
 
 ```bash

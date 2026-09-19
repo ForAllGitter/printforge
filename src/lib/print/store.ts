@@ -71,7 +71,7 @@ export const useStudio = create<StudioState>()(
         set({ library: get().library.filter((s) => s.id !== id) }),
     }),
     {
-      name: "printforge-studio-v7",
+      name: "printforge-studio-v8",
       storage: createJSONStorage(() =>
         typeof window === "undefined" ? memoryStorage : localStorage,
       ),
