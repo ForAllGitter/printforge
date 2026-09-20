@@ -96,7 +96,7 @@ function dims(s: number) {
     lugT: 5.4 * s,
     lugOut: 16 * s,
     lugH: 42 * s,
-    kerf: 0.35,
+    kerf: 0.55,
   };
 }
 
@@ -251,24 +251,26 @@ function packColorParts(parts: ColorPart[], gap = 8): ColorPart[] {
   return placed.map((p) => ({ ...p, geom: translate([-cx, 0, 0], p.geom) }));
 }
 
-/** Pulp drains. Skip the lug seam (+Y) and the hinge seam (−Y). */
+/** Pulp drains. Only skip a narrow strip where the lugs sit. */
 function pulpHoles(d: ReturnType<typeof dims>, s: number): Geom3[] {
   const punches: Geom3[] = [];
   const holeR = 1.55 * s;
-  const rows = 6;
-  const cols = 14;
-  const z0 = 7 * s;
-  const z1 = d.sleeveH - 7 * s;
+  const rows = 7;
+  const cols = 16;
+  const z0 = 6 * s;
+  const z1 = d.sleeveH - 6 * s;
   const midR = (d.boreR + d.sleeveOR) / 2;
   const depth = d.sleeveOR - d.boreR + 6;
   const blank = cylinder({ radius: holeR, height: depth, segments: 10 });
   const alongX = rotate([0, Math.PI / 2, 0], blank);
+  const lugA = Math.PI / 2;
   for (let row = 0; row < rows; row++) {
     const z = z0 + (Math.max(4, z1 - z0) * (row + 0.5)) / rows;
     const rotOff = (row % 2) * (Math.PI / cols);
     for (let i = 0; i < cols; i++) {
       const a = rotOff + (i * 2 * Math.PI) / cols;
-      if (Math.abs(Math.cos(a)) < 0.42) continue;
+      const da = Math.atan2(Math.sin(a - lugA), Math.cos(a - lugA));
+      if (Math.abs(da) < 0.22) continue;
       punches.push(translate([Math.cos(a) * midR, Math.sin(a) * midR, z], rotateZ(a, alongX)));
     }
   }
@@ -306,60 +308,6 @@ function addLug(half: Geom3, side: 1 | -1, d: ReturnType<typeof dims>): Geom3 {
   return union(half, lug);
 }
 
-/** Print-in-place knuckles on the −Y seam. Pin lives on half A. */
-function addHinge(half: Geom3, side: 1 | -1, d: ReturnType<typeof dims>, s: number): Geom3 {
-  const n = 5;
-  const z0 = 4 * s;
-  const z1 = d.sleeveH - 4 * s;
-  const span = z1 - z0;
-  const knuckleH = span / n - 0.4;
-  const r = 5.2 * s;
-  const pinR = 2.15 * s;
-  const hx = 0;
-  const hy = -(d.sleeveOR + r * 0.5);
-  const bits: Geom3[] = [];
-  for (let i = 0; i < n; i++) {
-    const ownerA = i % 2 === 0;
-    if (ownerA && side !== 1) continue;
-    if (!ownerA && side !== -1) continue;
-    const zc = z0 + (i + 0.5) * (span / n);
-    let k = cylinder({ radius: r, height: knuckleH, segments: 20, center: [hx, hy, zc] });
-    k = intersect(
-      k,
-      cuboid({ size: [80, 80, knuckleH + 2], center: [side * 40, hy, zc] }),
-    );
-    if (!ownerA) {
-      k = subtract(
-        k,
-        cylinder({
-          radius: pinR + 0.4,
-          height: knuckleH + 2,
-          segments: 16,
-          center: [hx, hy, zc],
-        }),
-      );
-    }
-    bits.push(k);
-  }
-  if (side === 1) {
-    bits.push(
-      cylinder({
-        radius: pinR,
-        height: span - 0.8,
-        segments: 16,
-        center: [hx, hy, (z0 + z1) / 2],
-      }),
-    );
-  }
-  bits.push(
-    cuboid({
-      size: [7.5 * s, r + 5 * s, span * 0.88],
-      center: [side * 3.8 * s, hy + r * 0.25, (z0 + z1) / 2],
-    }),
-  );
-  return union(half, unionAll(bits));
-}
-
 /**
  * Closed box clip: top, bottom and outer walls solid.
  * Open only toward the lugs so it slides on from the outside.
@@ -369,7 +317,7 @@ function sleeveClip(values: Values): Geom3 {
   const d = dims(s);
   const wall = 3.0 * s;
   const cap = 2.8 * s;
-  const innerX = 2 * d.lugT + 0.5 * s;
+  const innerX = 2 * d.lugT + 0.7 * s;
   const innerY = d.lugOut + 0.5 * s;
   const h = d.lugH - 0.6 * s;
   const outerX = innerX + 2 * wall;
@@ -389,92 +337,120 @@ function sleeveParts(values: Values): ColorPart[] {
   const s = kitScale(values);
   const d = dims(s);
   const body = sleeveBody(values);
-  let a = cutHalf(body, 1, d);
-  let b = cutHalf(body, -1, d);
-  a = addLug(a, 1, d);
-  b = addLug(b, -1, d);
-  a = addHinge(a, 1, d, s);
-  b = addHinge(b, -1, d, s);
+  let a = addLug(cutHalf(body, 1, d), 1, d);
+  let b = addLug(cutHalf(body, -1, d), -1, d);
   const txt = brandMark(labelOf(values), 6.2 * s, 0.6 * s, 1.15 * s, 1.8 * s);
   if (txt) a = subtract(a, translate([d.sleeveOR * 0.55, 0, -0.05], txt));
-  return packColorParts(
-    [
-      { name: "sleeve", color: "#c4b8a8", geom: union(a, b) },
-      { name: "clip", color: "#8a9aa8", geom: sleeveClip(values) },
-    ],
-    10,
-  );
+
+  const pair = union(a, b);
+  const bb = bboxOf(pair);
+  const dx = -(bb.min[0] + bb.max[0]) / 2;
+  const dy = -(bb.min[1] + bb.max[1]) / 2;
+  const dz = -bb.min[2];
+  a = translate([dx, dy, dz], a);
+  b = translate([dx, dy, dz], b);
+
+  const clip = sitOnBed(sleeveClip(values));
+  const pairBb = bboxOf(union(a, b));
+  const cbb = bboxOf(clip);
+  const clipPlaced = translate([pairBb.max[0] + 10 - cbb.min[0], 0, 0], clip);
+  const groupMin = pairBb.min[0];
+  const groupMax = bboxOf(clipPlaced).max[0];
+  const cx = (groupMin + groupMax) / 2;
+  return [
+    { name: "sleeve-a", color: "#c4b8a8", geom: translate([-cx, 0, 0], a) },
+    { name: "sleeve-b", color: "#d4c8b6", geom: translate([-cx, 0, 0], b) },
+    { name: "clip", color: "#8a9aa8", geom: translate([-cx, 0, 0], clipPlaced) },
+  ];
+}
+
+function sieveFloorHoles(rMax: number, holeR: number, pitch: number, h: number): Geom3[] {
+  const punches: Geom3[] = [];
+  const rowH = pitch * 0.8660254;
+  const blank = cylinder({
+    radius: holeR,
+    height: h + 4,
+    segments: 8,
+    center: [0, 0, h / 2],
+  });
+  let row = 0;
+  for (let y = -rMax; y <= rMax + 0.01; y += rowH) {
+    const xOff = (row % 2) * (pitch / 2);
+    row += 1;
+    for (let x = -rMax; x <= rMax + 0.01; x += pitch) {
+      const px = x + xOff;
+      if (px * px + y * y > rMax * rMax) continue;
+      punches.push(translate([px, y, 0], blank));
+    }
+  }
+  return punches;
 }
 
 /**
- * Drain cage that the sleeve (or grounds pot) sits in, and that locates
- * on the hex plate. Perforated floor + wall holes at every height.
+ * Water sieve. Tight inside the sleeve bore, perforated floor so water
+ * drops into the hex tray, short rim like a coffee sieve.
  */
 function drainRing(values: Values): Geom3 {
   const s = kitScale(values);
   const d = dims(s);
-  const wallHoleR = Math.min(3.1 * s, n(values, "hole", 7.5, 4, 16) * s * 0.4);
+  const or = d.boreR - 0.25;
+  const floorT = 2.6 * s;
+  const rimH = 7.2 * s;
+  const rimW = 2.8 * s;
+  const holeR = 1.65 * s;
 
-  const floor = cyl(d.flangeR, d.floorT, d.floorT / 2, 56);
-  const wall = ring(d.sleeveOR, d.boreR, d.ringH);
-  const ledge = cyl(d.sleeveOR, 2.4 * s, d.ringH - d.collar - 1.2 * s, 48);
-  const collarInner = d.sleeveOR + 0.4 * s;
-  const collarOuter = collarInner + d.collarWall;
-  const collar = ring(collarOuter, collarInner, d.collar);
-  let g = union(floor, wall, ledge, translate([0, 0, d.ringH - d.collar], collar));
-
-  const wallPunch = wallHoles(
-    d.boreR,
-    d.sleeveOR,
-    wallHoleR,
-    4,
-    12,
-    d.floorT + wallHoleR + 1.2 * s,
-    d.ringH - d.collar - wallHoleR - 1.4 * s,
-  );
-  const floorPunch = floorHoles(2.7 * s, d.floorT, [
-    { r: 14 * s, n: 6 },
-    { r: 24 * s, n: 10 },
-    { r: 34 * s, n: 14 },
-  ]);
-  g = punchAll(g, [...wallPunch, ...floorPunch]);
+  let g = cyl(or, floorT, floorT / 2, 64);
+  g = union(g, translate([0, 0, floorT], ring(or, Math.max(0.8, or - rimW), rimH)));
+  const rMax = Math.max(4, or - rimW - holeR - 0.5);
+  g = punchAll(g, sieveFloorHoles(rMax, holeR, 7.2 * s, floorT));
   return sitOnBed(g);
 }
 
 /**
- * Hex drain plate. Four round holes at 45°, radial ribs so water can
- * run under the puck, fence that locates the drain-ring flange.
+ * Hex drip tray. Closed floor so water is stored, four pads the sleeve
+ * foot sits on, outer lips on those pads so the sleeve stays located
+ * while you press.
  */
 function plate(values: Values): Geom3 {
   const s = kitScale(values);
   const d = dims(s);
-  const drainR = n(values, "hole", 7.5, 4, 16) * s * 1.15;
+  const floorH = 2.8 * s;
+  const rimH = 14 * s;
+  const padH = 5.2 * s;
+  const rimW = 8.5 * s;
 
-  let g = hexPrism(d.plateF2F, d.plateT);
+  const outer = hexPrism(d.plateF2F, rimH);
+  const well = translate([0, 0, floorH], hexPrism(d.plateF2F - 2 * rimW, rimH + 2));
+  let g = subtract(outer, well);
 
-  const ribs: Geom3[] = [];
-  const ribLen = d.flangeR - 8 * s;
-  for (let i = 0; i < 4; i++) {
-    const a = (i * Math.PI) / 2;
-    const rib = cuboid({
-      size: [ribLen, d.ribW, d.ribH],
-      center: [8 * s + ribLen / 2, 0, d.plateT + d.ribH / 2],
-    });
-    ribs.push(rotateZ(a, rib));
-  }
-  g = union(g, unionAll(ribs));
-
-  const fence = ring(d.fenceOR, d.fenceIR, d.ribH + d.floorT * 0.7);
-  g = union(g, translate([0, 0, d.plateT], fence));
-
-  const holePunches: Geom3[] = [holeZ(6.2 * s, d.plateT + d.ribH, [0, 0], -0.5)];
+  const padLen = 18 * s;
+  const padW = 16 * s;
+  const padR = d.sleeveOR - 0.6 * s;
+  const footOR = d.sleeveOR + 0.8 * s;
+  const lipIR = footOR + 0.3;
+  const lipOR = lipIR + 2.6 * s;
+  const lipH = 5.4 * s;
+  const pads: Geom3[] = [];
   for (let i = 0; i < 4; i++) {
     const a = Math.PI / 4 + (i * Math.PI) / 2;
-    holePunches.push(
-      holeZ(drainR, d.plateT + d.ribH, [Math.cos(a) * d.holePitch, Math.sin(a) * d.holePitch], -0.5),
+    const pad = cuboid({
+      size: [padLen, padW, padH],
+      center: [padR, 0, floorH + padH / 2],
+    });
+    let lip = translate([0, 0, floorH], ring(lipOR, lipIR, padH + lipH));
+    lip = intersect(
+      lip,
+      cuboid({
+        size: [lipOR + 6, padW, padH + lipH + 2],
+        center: [(lipIR + lipOR) / 2, 0, floorH + (padH + lipH) / 2],
+      }),
     );
+    pads.push(rotateZ(a, union(pad, lip)));
   }
-  g = punchAll(g, holePunches);
+  g = union(g, unionAll(pads));
+
+  const txt = brandMark(labelOf(values), 7.2 * s, 0.58 * s, 1.15 * s, 2.2 * s);
+  if (txt) g = subtract(g, translate([0, 0, floorH - 1.05 * s], txt));
   return sitOnBed(g);
 }
 
@@ -554,19 +530,24 @@ export function handPressAdvice(values: Values): PrintAdvice {
         ]
       : part === "sleeve"
         ? [
-            "Part 2 of 4 — two pieces: hinged sleeve + one clip.",
-            "Halves are joined on one side (print-in-place hinge). One pair of long lugs on the other.",
-            "Clip is a closed box (top and bottom solid) that slides onto the lugs.",
-            "More, larger drain holes (Ø3.5 mm) so water leaves the cardboard pulp.",
-            "Tell me if the hinge, lugs and clip look right. Then we do the hex plate.",
+            "Part 2 of 4 — two loose halves that make a closed ring, plus one clip.",
+            "No hinge. Pull the halves apart like the original sleeve, drop them around the pulp, clip the lugs.",
+            "Clip is a closed box that slides onto the two separate lugs.",
+            "Tell me if this opens the way you want. Then we do the hex plate.",
           ]
         : part === "plate"
           ? [
-              "Part 3 of 4 — hex plate only. Ribs + four round drain holes + locating fence.",
+              "Part 3 of 4 — hex drip tray. Closed floor, water stays in the well.",
+              "Four pads with a small outer lip so the sleeve stays locked while you press.",
+              `${mark} is recessed in the centre. No through-holes — the plate is the reservoir.`,
+              "Tell me if the pads and tray look right. Then we do the drain ring.",
             ]
           : part === "ring"
             ? [
-                "Part 4 of 4 — drain ring only. Cage with holes at every height. Sleeve drops into the collar.",
+                "Part 4 of 4 — water sieve. Tight inside the sleeve (0.25 mm clearance).",
+                "Perforated floor like the sieve photo. Water drops through into the hex tray.",
+                "Short rim. Sits on the four plate pads. No supports.",
+                "Tell me if the fit and holes look right.",
               ]
             : [`Printing the ${part}.`];
   if (s > 1.001) {

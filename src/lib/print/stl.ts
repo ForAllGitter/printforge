@@ -1,7 +1,7 @@
 import { bboxOf, toPolygons, volumeMm3, type Geom3 } from "./geometry";
 import type { ColorPart } from "./types";
 
-function writeBinaryStl(geom: Geom3, name: string): ArrayBuffer {
+export function writeBinaryStl(geom: Geom3, name: string): ArrayBuffer {
   const polys = toPolygons(geom);
   let tri = 0;
   for (const p of polys) tri += Math.max(0, p.vertices.length - 2);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getDesign } from "./catalog";
 import { kitFilesFor, kitPartOf, kitScaleOf, loadKitPreview } from "./kit-stl";
 import { geomToThree } from "./mesh";
@@ -32,6 +32,18 @@ export function useDebouncedValues() {
   return ready;
 }
 
+function emptyModel(designId: string, error: string | null = null): BuiltModel {
+  return {
+    design: getDesign(designId),
+    parts: [],
+    geom: null,
+    stats: null,
+    geometry: null,
+    error,
+    kitFile: null,
+  };
+}
+
 function buildProcedural(designId: string, values: ReturnType<typeof useDebouncedValues>["values"]): BuiltModel {
   const design = getDesign(designId);
   try {
@@ -53,22 +65,26 @@ function buildProcedural(designId: string, values: ReturnType<typeof useDebounce
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Could not build this solid";
-    return {
-      design,
-      parts: [],
-      geom: null,
-      stats: null,
-      geometry: null,
-      error: message,
-      kitFile: null,
-    };
+    return emptyModel(designId, message);
   }
 }
 
 export function useBuiltModel(): BuiltModel {
   const { designId, values } = useDebouncedValues();
-  const procedural = useMemo(() => buildProcedural(designId, values), [designId, values]);
+  const [procedural, setProcedural] = useState<BuiltModel>(() => emptyModel(designId));
   const [kit, setKit] = useState<BuiltModel | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    const t = window.setTimeout(() => {
+      const next = buildProcedural(designId, values);
+      if (live) setProcedural(next);
+    }, 0);
+    return () => {
+      live = false;
+      window.clearTimeout(t);
+    };
+  }, [designId, values]);
 
   const part = kitPartOf(values);
   const scale = kitScaleOf(values);

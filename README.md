@@ -40,14 +40,14 @@ Crypto coins plus snap-lid boxes, divider bins, phone stands, cable clips, namep
 
 ## D3DD briquette press
 
-Working cardboard-pulp / coffee-grounds press, 14% larger than the original Outin kit. One part at a time:
+Working cardboard-pulp / coffee-grounds press, 14% larger than the original Outin kit.
 
 1. **Handle** — T-bar on top, blended into the shaft, D3DD recessed 1 mm. No hang hole.
-2. **Sleeve** — two halves joined with a print-in-place hinge, one pair of long outer lugs, closed-box clip. Drain holes Ø3.5 mm.
-3. **Hex plate** — next.
-4. **Drain ring** — next.
+2. **Sleeve** — two loose halves + closed clip. Dense Ø3.5 mm drain holes.
+3. **Hex plate** — closed water tray, four rest pads with locating lips, D3DD in the well.
+4. **Drain sieve** — tight in the sleeve bore, perforated floor.
 
-PrintForge defaults to the sleeve so you can inspect the hinge, lugs, and clip.
+Print-ready STLs: [`public/prints/d3dd-press/`](public/prints/d3dd-press/). P2S settings: [PRESS.md](PRESS.md).
 
 ## Run locally
 
@@ -70,7 +70,7 @@ Requires Node 22+.
 
 ## Print day
 
-P2S settings, AMS mapping, and a suggested order: [PRINT.md](PRINT.md).
+P2S settings: coins in [PRINT.md](PRINT.md), briquette press in [PRESS.md](PRESS.md).
 
 ## License
 
