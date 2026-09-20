@@ -49,6 +49,17 @@ Working cardboard-pulp / coffee-grounds press, 14% larger than the original Outi
 
 Print-ready STLs: [`public/prints/d3dd-press/`](public/prints/d3dd-press/). P2S settings: [PRESS.md](PRESS.md).
 
+## D3DD cardboard press
+
+Rectangular pulp press, 140 × 70 mm inside.
+
+1. **Sleeve** — through-tube, 5 mm walls, side drain holes.
+2. **Stamp** — I-beam, D3DD recessed 1 mm, slides in the sleeve.
+3. **Sieve** — hex floor, sleeve drops in from above.
+4. **Tray** — closed well with gutter for side-hole water, four L-lips.
+
+Print-ready STLs: [`public/prints/d3dd-cardboard/`](public/prints/d3dd-cardboard/). P2S settings: [CARDBOARD.md](CARDBOARD.md).
+
 ## Run locally
 
 ```bash
@@ -70,7 +81,7 @@ Requires Node 22+.
 
 ## Print day
 
-P2S settings: coins in [PRINT.md](PRINT.md), briquette press in [PRESS.md](PRESS.md).
+P2S settings: coins in [PRINT.md](PRINT.md), round press in [PRESS.md](PRESS.md), cardboard press in [CARDBOARD.md](CARDBOARD.md).
 
 ## License
 

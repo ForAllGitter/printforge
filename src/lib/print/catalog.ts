@@ -31,6 +31,7 @@ import {
 } from "./coins";
 import { cupLid, cupLidAdvice } from "./cup-lid";
 import { handPress, handPressAdvice } from "./handpress";
+import { cardboardPress, cardboardPressAdvice } from "./cardboard-press";
 
 import {
   bool,
@@ -585,6 +586,51 @@ export const DESIGNS: Design[] = [
     ],
     build: handPress,
     advice: handPressAdvice,
+  },
+  {
+    id: "cardboard-press",
+    name: "Cardboard press",
+    category: "Everyday",
+    blurb: "Rectangular cardboard-pulp press. One part at a time: sleeve, stamp, sieve, tray.",
+    keywords: [
+      "cardboard",
+      "press",
+      "pulp",
+      "briquette",
+      "sleeve",
+      "stamp",
+      "sieve",
+      "d3dd",
+      "rectangle",
+    ],
+    params: [
+      {
+        key: "part",
+        kind: "select",
+        label: "Part",
+        options: [
+          { value: "sleeve", label: "1 · Sleeve" },
+          { value: "stamp", label: "2 · Stamp" },
+          { value: "sieve", label: "3 · Drain sieve" },
+          { value: "tray", label: "4 · Drainage tray" },
+        ],
+        default: "tray",
+      },
+      mm("innerL", "Inside length", 140, 40, 240, 1),
+      mm("innerW", "Inside width", 70, 30, 180, 1),
+      mm("wall", "Wall / rim", 5, 2.4, 12, 0.1),
+      mm("height", "Height", 50, 24, 140, 1),
+      mm("hole", "Side hole radius", 1.9, 0.8, 4, 0.1),
+      {
+        key: "brand",
+        kind: "text",
+        label: "Stamp",
+        default: "D3DD",
+        maxLength: 8,
+      },
+    ],
+    build: cardboardPress,
+    advice: cardboardPressAdvice,
   },
   {
     id: "cup-lid",

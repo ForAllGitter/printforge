@@ -25,7 +25,7 @@ type StudioState = {
   removeSaved: (id: string) => void;
 };
 
-const start = getDesign("briquette-press") ?? getDesign("cup-lid") ?? DESIGNS[0]!;
+const start = getDesign("cardboard-press") ?? getDesign("briquette-press") ?? DESIGNS[0]!;
 
 const memoryStorage = {
   getItem: () => null,
@@ -71,7 +71,7 @@ export const useStudio = create<StudioState>()(
         set({ library: get().library.filter((s) => s.id !== id) }),
     }),
     {
-      name: "printforge-studio-v8",
+      name: "printforge-studio-v9",
       storage: createJSONStorage(() =>
         typeof window === "undefined" ? memoryStorage : localStorage,
       ),

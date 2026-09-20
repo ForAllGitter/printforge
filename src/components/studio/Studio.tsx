@@ -52,6 +52,7 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   "dogecoin-coin": Coins,
   "digibyte-coin": Coins,
   "briquette-press": Printer,
+  "cardboard-press": Box,
   "cup-lid": Circle,
   "snap-box": Box,
   "divider-bin": LayoutGrid,
@@ -406,6 +407,34 @@ function ParamPanel({
             onClick={() => {
               setValue("part", "ring");
               setValue("scale", 114);
+            }}
+          />
+        </div>
+      ) : null}
+      {designId === "cardboard-press" ? (
+        <div className="flex flex-wrap gap-1.5 px-4 pt-3">
+          <PresetChip
+            label="1 Sleeve"
+            onClick={() => {
+              setValue("part", "sleeve");
+            }}
+          />
+          <PresetChip
+            label="2 Stamp"
+            onClick={() => {
+              setValue("part", "stamp");
+            }}
+          />
+          <PresetChip
+            label="3 Sieve"
+            onClick={() => {
+              setValue("part", "sieve");
+            }}
+          />
+          <PresetChip
+            label="4 Tray"
+            onClick={() => {
+              setValue("part", "tray");
             }}
           />
         </div>
