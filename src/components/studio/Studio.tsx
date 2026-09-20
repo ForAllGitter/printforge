@@ -53,6 +53,7 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   "digibyte-coin": Coins,
   "briquette-press": Printer,
   "cardboard-press": Box,
+  "pad-dryer": Hexagon,
   "cup-lid": Circle,
   "snap-box": Box,
   "divider-bin": LayoutGrid,
@@ -435,6 +436,28 @@ function ParamPanel({
             label="4 Tray"
             onClick={() => {
               setValue("part", "tray");
+            }}
+          />
+        </div>
+      ) : null}
+      {designId === "pad-dryer" ? (
+        <div className="flex flex-wrap gap-1.5 px-4 pt-3">
+          <PresetChip
+            label="Both on the bed"
+            onClick={() => {
+              setValue("part", "kit");
+            }}
+          />
+          <PresetChip
+            label="1 Base"
+            onClick={() => {
+              setValue("part", "base");
+            }}
+          />
+          <PresetChip
+            label="2 Holder"
+            onClick={() => {
+              setValue("part", "basket");
             }}
           />
         </div>

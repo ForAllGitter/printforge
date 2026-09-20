@@ -101,6 +101,7 @@ export function parseBrief(prompt: string): BriefResult {
   if (/drain ring|ring/.test(q) && best.id === "briquette-press") values.part = "ring";
   if (/stack|kit|4 part/.test(q) && best.id === "briquette-press") values.part = "handle";
   if (/cardboard/.test(q) && best.id === "cardboard-press") values.part = "sleeve";
+  if (/pad|senseo|dryer|pod bin/.test(q) && best.id === "pad-dryer") values.part = "kit";
   if (!size && mmHits.length >= 1 && best.id.endsWith("-coin")) {
     values.diameter = mmHits[0]!;
     if (mmHits[1]) values.height = mmHits[1]!;

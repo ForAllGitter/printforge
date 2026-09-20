@@ -60,6 +60,15 @@ Rectangular pulp press, 140 × 70 mm inside.
 
 Print-ready STLs: [`public/prints/d3dd-cardboard/`](public/prints/d3dd-cardboard/). P2S settings: [CARDBOARD.md](CARDBOARD.md).
 
+## D3DD coffee pad dryer
+
+Senseo pad drying basket plus a drip base.
+
+1. **Base** — closed well, D3DD recessed, four pads so the basket sits above the water.
+2. **Holder** — hex lattice, hex drain floor, no supports. Inner Ø76 mm for 70 mm pads.
+
+Print-ready STLs: [`public/prints/d3dd-pad-dryer/`](public/prints/d3dd-pad-dryer/). P2S settings: [PADDRYER.md](PADDRYER.md).
+
 ## Run locally
 
 ```bash
@@ -81,7 +90,7 @@ Requires Node 22+.
 
 ## Print day
 
-P2S settings: coins in [PRINT.md](PRINT.md), round press in [PRESS.md](PRESS.md), cardboard press in [CARDBOARD.md](CARDBOARD.md).
+P2S settings: coins in [PRINT.md](PRINT.md), round press in [PRESS.md](PRESS.md), cardboard press in [CARDBOARD.md](CARDBOARD.md), pad dryer in [PADDRYER.md](PADDRYER.md).
 
 ## License
 

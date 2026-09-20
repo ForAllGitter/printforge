@@ -32,6 +32,7 @@ import {
 import { cupLid, cupLidAdvice } from "./cup-lid";
 import { handPress, handPressAdvice } from "./handpress";
 import { cardboardPress, cardboardPressAdvice } from "./cardboard-press";
+import { padDryer, padDryerAdvice } from "./pad-dryer";
 
 import {
   bool,
@@ -631,6 +632,47 @@ export const DESIGNS: Design[] = [
     ],
     build: cardboardPress,
     advice: cardboardPressAdvice,
+  },
+  {
+    id: "pad-dryer",
+    name: "Coffee pad dryer",
+    category: "Everyday",
+    blurb: "Senseo pad drying basket plus a D3DD drip base. Hex lattice, no supports.",
+    keywords: [
+      "coffee",
+      "pad",
+      "senseo",
+      "dryer",
+      "basket",
+      "silica",
+      "drip",
+      "d3dd",
+      "pod",
+    ],
+    params: [
+      {
+        key: "part",
+        kind: "select",
+        label: "Part",
+        options: [
+          { value: "kit", label: "Both on the bed" },
+          { value: "base", label: "1 · Leaking base" },
+          { value: "basket", label: "2 · Pad holder" },
+        ],
+        default: "kit",
+      },
+      mm("pad", "Pad diameter", 70, 50, 90, 0.5),
+      mm("height", "Basket height", 108, 60, 180, 1),
+      {
+        key: "brand",
+        kind: "text",
+        label: "Stamp",
+        default: "D3DD",
+        maxLength: 8,
+      },
+    ],
+    build: padDryer,
+    advice: padDryerAdvice,
   },
   {
     id: "cup-lid",
