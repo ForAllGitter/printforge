@@ -336,30 +336,27 @@ function sleeveClip(values: Values): Geom3 {
 function sleeveParts(values: Values): ColorPart[] {
   const s = kitScale(values);
   const d = dims(s);
-  const body = sleeveBody(values);
-  let a = addLug(cutHalf(body, 1, d), 1, d);
-  let b = addLug(cutHalf(body, -1, d), -1, d);
+  let g = sleeveBody(values);
+  const slit = cuboid({
+    size: [Math.max(0.55, d.kerf), d.sleeveOR + d.lugOut + 12, d.sleeveH + 10],
+    center: [0, (d.sleeveOR + d.lugOut + 12) / 2, d.sleeveH / 2],
+  });
+  g = subtract(g, slit);
+  g = addLug(g, 1, d);
+  g = addLug(g, -1, d);
   const txt = brandMark(labelOf(values), 6.2 * s, 0.6 * s, 1.15 * s, 1.8 * s);
-  if (txt) a = subtract(a, translate([d.sleeveOR * 0.55, 0, -0.05], txt));
-
-  const pair = union(a, b);
-  const bb = bboxOf(pair);
-  const dx = -(bb.min[0] + bb.max[0]) / 2;
-  const dy = -(bb.min[1] + bb.max[1]) / 2;
-  const dz = -bb.min[2];
-  a = translate([dx, dy, dz], a);
-  b = translate([dx, dy, dz], b);
+  if (txt) g = subtract(g, translate([0, -d.sleeveOR * 0.55, -0.05], txt));
+  g = sitOnBed(g);
 
   const clip = sitOnBed(sleeveClip(values));
-  const pairBb = bboxOf(union(a, b));
+  const sbb = bboxOf(g);
   const cbb = bboxOf(clip);
-  const clipPlaced = translate([pairBb.max[0] + 10 - cbb.min[0], 0, 0], clip);
-  const groupMin = pairBb.min[0];
+  const clipPlaced = translate([sbb.max[0] + 10 - cbb.min[0], 0, 0], clip);
+  const groupMin = sbb.min[0];
   const groupMax = bboxOf(clipPlaced).max[0];
   const cx = (groupMin + groupMax) / 2;
   return [
-    { name: "sleeve-a", color: "#c4b8a8", geom: translate([-cx, 0, 0], a) },
-    { name: "sleeve-b", color: "#d4c8b6", geom: translate([-cx, 0, 0], b) },
+    { name: "sleeve", color: "#c4b8a8", geom: translate([-cx, 0, 0], g) },
     { name: "clip", color: "#8a9aa8", geom: translate([-cx, 0, 0], clipPlaced) },
   ];
 }
@@ -530,10 +527,9 @@ export function handPressAdvice(values: Values): PrintAdvice {
         ]
       : part === "sleeve"
         ? [
-            "Part 2 of 4 — two loose halves that make a closed ring, plus one clip.",
-            "No hinge. Pull the halves apart like the original sleeve, drop them around the pulp, clip the lugs.",
-            "Clip is a closed box that slides onto the two separate lugs.",
-            "Tell me if this opens the way you want. Then we do the hex plate.",
+            "Part 2 of 4 — one sleeve plus clip. Ring is a single piece.",
+            "Only the clip side has a ~0.55 mm slit. Lugs sit on that gap; clip slides on to close it.",
+            "Print standing. No supports.",
           ]
         : part === "plate"
           ? [

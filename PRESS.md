@@ -13,13 +13,12 @@ Print every part **as it sits in the STL** (already on the bed).
 | File | What | Orient | Est. |
 | --- | --- | --- | --- |
 | `D3DD_handle.stl` | Press handle, T-bar on top, D3DD recessed | As exported | ~80 mm tall |
-| `D3DD_sleeve-a.stl` | Sleeve half + one lug | Split face on the bed | ~66 mm |
-| `D3DD_sleeve-b.stl` | Other half + lug | Split face on the bed | ~66 mm |
-| `D3DD_clip.stl` | Closed box that slides onto both lugs | Opening to the side | ~47 mm |
+| `D3DD_sleeve.stl` | One-piece sleeve, slit + lugs on the clip side | Standing | ~66 mm |
+| `D3DD_clip.stl` | Closed box that slides onto the two lugs | Opening to the side | ~47 mm |
 | `D3DD_hex-plate.stl` | Water tray, 4 pads + lips, D3DD in the well | Floor on the bed | 150 × 173 × 16 mm |
 | `D3DD_sieve.stl` | Tight water sieve | Floor on the bed | Ø93 × 11 mm |
 
-Sleeve halves: **split face down** so the outer curve prints as a wall. Clip: no supports. Sieve holes are Ø~3.8 mm — they print without supports at 0.20 mm.
+Sleeve: **standing**. One piece except a 0.55 mm slit at the lugs. Clip: no supports. Sieve holes are Ø~3.8 mm — they print without supports at 0.20 mm.
 
 ---
 
@@ -36,8 +35,8 @@ Sleeve halves: **split face down** so the outer curve prints as a wall. Clip: no
 ## Assemble
 
 1. Drop the **sieve** onto the four pads of the **hex plate**.
-2. Wrap the two **sleeve** halves around the sieve. Outer foot sits on the pads; the small lips lock it.
-3. Slide the **clip** onto the two lugs.
+2. Drop the **sleeve** onto the sieve. Outer foot sits on the pads; the small lips lock it.
+3. Slide the **clip** onto the two lugs to close the slit.
 4. Fill with cardboard pulp (or coffee grounds). Press with the **handle**.
 5. Water runs through the sieve into the tray. Unclip, split the sleeve, pop the briquette out.
 

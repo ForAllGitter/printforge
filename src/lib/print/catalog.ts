@@ -556,14 +556,14 @@ export const DESIGNS: Design[] = [
         label: "Part",
         options: [
           { value: "handle", label: "1 · Handle" },
-          { value: "sleeve", label: "2 · Sleeve (2 halves + clip)" },
+          { value: "sleeve", label: "2 · Sleeve (one piece + clip)" },
           { value: "plate", label: "3 · Hex plate" },
           { value: "ring", label: "4 · Drain sieve" },
           { value: "container", label: "Grounds pot" },
           { value: "lid", label: "Pot lid" },
           { value: "spatula", label: "Spatula" },
         ],
-        default: "ring",
+        default: "sleeve",
       },
       {
         key: "scale",
