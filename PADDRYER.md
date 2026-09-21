@@ -11,7 +11,7 @@ Print every part as it sits in the STL.
 
 | File | What | Size |
 | --- | --- | --- |
-| `D3DD_pad_base.stl` | Drip dish, D3DD recessed, 4 pads | Ø90 × 28 mm |
+| `D3DD_pad_base.stl` | Drip dish, D3DD recessed, 4 inside pads | Ø90 × 28 mm |
 | `D3DD_pad_holder.stl` | Hex basket for Senseo pads | Ø83 × 108 mm |
 
 Senseo pads (~70 mm) stack in the holder. Holder inner is Ø76 mm.
@@ -23,7 +23,7 @@ Senseo pads (~70 mm) stack in the holder. Holder inner is Ø76 mm.
 - No supports (the voronoi original needed them)
 - Hex lattice instead of organic cells — more pad support, still airy
 - Hex drain floor instead of the decorative spiral
-- Basket sits on four pads so used pads are not in the puddle
+- Basket sits on four **inside** pads (7 mm) so used pads are not in the puddle and get air underneath
 - Base locates the basket (0.45 mm gap)
 - D3DD recessed in the well
 

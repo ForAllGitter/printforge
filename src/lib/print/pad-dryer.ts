@@ -88,7 +88,7 @@ export function dryerDims(values: Values) {
   const basketH = n(values, "height", 108, 60, 180);
   const baseH = 28;
   const floorT = 3.0;
-  const padH = 4.6;
+  const padH = 7.2;
   return {
     pad,
     basketIR,
@@ -174,9 +174,10 @@ function leakingBase(values: Values): Geom3 {
   );
 
   const pads: Geom3[] = [];
-  const padLen = 14;
-  const padW = 8;
-  const padR = (d.baseIR + d.basketOR) / 2;
+  const padLen = 16;
+  const padW = 10;
+  const outerEnd = d.basketOR - 1.2;
+  const padR = outerEnd - padLen / 2;
   for (let i = 0; i < 4; i++) {
     const a = (i * Math.PI) / 2 + Math.PI / 4;
     const cx = Math.cos(a) * padR;
@@ -246,7 +247,7 @@ export function padDryerAdvice(values: Values): PrintAdvice {
     part === "base"
       ? [
           "Part 1 — leaking base. Closed floor catches drips. D3DD recessed 1 mm.",
-          "Four pads lift the basket so pads are not sitting in the puddle.",
+          "Four taller inside pads lift the basket for airflow. No lumps through the outer wall.",
         ]
       : part === "basket"
         ? [
