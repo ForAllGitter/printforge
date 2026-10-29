@@ -14,7 +14,7 @@ Print every part **as it sits in the STL** (already on the bed).
 | --- | --- | --- | --- |
 | `D3DD_handle.stl` | Press handle, T-bar on top, D3DD recessed | As exported | ~80 mm tall |
 | `D3DD_sleeve.stl` | One-piece sleeve, slit + lugs on the clip side | Standing | ~66 mm |
-| `D3DD_clip.stl` | Closed box that slides onto the two lugs. Opening is 1 mm taller top and bottom. | Opening to the side | ~49 mm |
+| `D3DD_clip.stl` | Closed box that slides onto the two lugs. Opening is 3 mm taller top and bottom. | Opening to the side | ~53 mm |
 | `D3DD_hex-plate.stl` | Water tray, 4 pads + lips, D3DD in the well | Floor on the bed | 150 × 173 × 16 mm |
 | `D3DD_sieve.stl` | Tight water sieve | Floor on the bed | Ø93 × 11 mm |
 
