@@ -319,7 +319,7 @@ function sleeveClip(values: Values): Geom3 {
   const cap = 2.8 * s;
   const innerX = 2 * d.lugT + 0.7 * s;
   const innerY = d.lugOut + 0.5 * s;
-  const h = d.lugH - 0.6 * s;
+  const h = d.lugH - 0.6 * s + 2;
   const outerX = innerX + 2 * wall;
   const outerY = innerY + wall;
   let g = cuboid({ size: [outerX, outerY, h], center: [0, wall / 2, h / 2] });
@@ -529,7 +529,7 @@ export function handPressAdvice(values: Values): PrintAdvice {
         ? [
             "Part 2 of 4 — one sleeve plus clip. Ring is a single piece.",
             "Only the clip side has a ~0.55 mm slit. Lugs sit on that gap; clip slides on to close it.",
-            "Print standing. No supports.",
+            "Clip opening is 1 mm taller at the top and the bottom so it slides onto the lugs.",
           ]
         : part === "plate"
           ? [
