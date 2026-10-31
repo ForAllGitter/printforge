@@ -12,7 +12,7 @@ Print every part as it sits in the STL (already on the bed).
 | File | What | Orient | Size |
 | --- | --- | --- | --- |
 | `D3DD_cardboard_sleeve.stl` | Open tube, side drain holes | Floor on the bed | 150 × 80 × 50 mm inside 140 × 70 |
-| `D3DD_cardboard_stamp.stl` | I-beam press, D3DD recessed | Foot on the bed | 139 × 69 × 44 mm |
+| `D3DD_cardboard_stamp.stl` | I-beam press. Middle 3 hole rows closed. Two open drain rows each side. | Foot on the bed | 139 × 69 × 44 mm |
 | `D3DD_cardboard_sieve.stl` | Hex sieve the sleeve drops into | Floor on the bed | 158.5 × 88.5 × 11 mm |
 | `D3DD_cardboard_tray.stl` | Water tray, 4 L-lips | Floor on the bed | 199 × 125 × 16 mm |
 

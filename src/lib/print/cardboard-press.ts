@@ -140,22 +140,35 @@ function brandMark(
   );
 }
 
-function hexFloorHoles(L: number, W: number, t: number, f2f: number, pitch: number): Geom3[] {
+function hexFloorHoles(
+  L: number,
+  W: number,
+  t: number,
+  f2f: number,
+  pitch: number,
+  closeMiddle = 0,
+): Geom3[] {
   const punches: Geom3[] = [];
   const rowH = pitch * 0.8660254;
   const rMaxX = L / 2 - f2f - 3;
   const rMaxY = W / 2 - f2f - 3;
   const blank = hexPrism(f2f, t + 4);
-  let row = 0;
-  for (let y = -rMaxY; y <= rMaxY + 0.01; y += rowH) {
+  const ys: number[] = [];
+  for (let y = -rMaxY; y <= rMaxY + 0.01; y += rowH) ys.push(y);
+  const closed = new Set<number>();
+  if (closeMiddle > 0 && ys.length >= closeMiddle + 4) {
+    const start = Math.floor((ys.length - closeMiddle) / 2);
+    for (let i = 0; i < closeMiddle; i++) closed.add(start + i);
+  }
+  ys.forEach((y, row) => {
+    if (closed.has(row)) return;
     const xOff = (row % 2) * (pitch / 2);
-    row += 1;
     for (let x = -rMaxX; x <= rMaxX + 0.01; x += pitch) {
       const px = x + xOff;
       if (Math.abs(px) > rMaxX) continue;
       punches.push(translate([px, y, -1], blank));
     }
-  }
+  });
   return punches;
 }
 
@@ -178,7 +191,7 @@ function stamp(values: Values): Geom3 {
   const stem = cuboid({ size: [L, stemW, stemH], center: [0, 0, plateT + stemH / 2] });
   const top = cuboid({ size: [L, W, topH], center: [0, 0, plateT + stemH + topH / 2] });
   let g = union(plate, stem, top);
-  g = punchAll(g, hexFloorHoles(L, W, plateT, 5.6, 9.2));
+  g = punchAll(g, hexFloorHoles(L, W, plateT, 5.6, 9.2, 3));
 
   const mark = brandMark(str(values, "brand", "D3DD"), 10, 0.72, 1.15, 2.4);
   if (mark) g = subtract(g, translate([0, 0, totalH - 1.12], mark));
@@ -311,7 +324,7 @@ export function cardboardPressAdvice(values: Values): PrintAdvice {
             "Part 2 of 4 — stamp only. Same I-beam as your 3MF, sized to slide in the sleeve.",
             `Foot ${ (d.innerL - 1).toFixed(0) } × ${ (d.innerW - 1).toFixed(0) } mm (0.5 mm gap each side).`,
             `${str(values, "brand", "D3DD")} is recessed 1 mm into the pushing face, letters spaced.`,
-            "Hex holes through the foot so water leaves while you press.",
+            "Middle 3 hole rows are solid. Two full open drain rows remain on each side of the foot.",
             "Tell me if this stamp looks right. Then we do the sieve.",
           ]
         : part === "sieve"

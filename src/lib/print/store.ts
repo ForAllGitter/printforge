@@ -25,7 +25,7 @@ type StudioState = {
   removeSaved: (id: string) => void;
 };
 
-const start = getDesign("pad-dryer") ?? getDesign("cardboard-press") ?? DESIGNS[0]!;
+const start = getDesign("cardboard-press") ?? DESIGNS[0]!;
 
 const memoryStorage = {
   getItem: () => null,
@@ -37,7 +37,7 @@ export const useStudio = create<StudioState>()(
   persist(
     (set, get) => ({
       designId: start.id,
-      values: defaultsOf(start),
+      values: { ...defaultsOf(start), part: "stamp" },
       filamentId: "true-white",
       library: [],
       setDesign: (id) => {
@@ -71,7 +71,7 @@ export const useStudio = create<StudioState>()(
         set({ library: get().library.filter((s) => s.id !== id) }),
     }),
     {
-      name: "printforge-studio-v10",
+      name: "printforge-studio-v13",
       storage: createJSONStorage(() =>
         typeof window === "undefined" ? memoryStorage : localStorage,
       ),
